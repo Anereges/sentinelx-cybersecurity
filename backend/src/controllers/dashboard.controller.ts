@@ -186,9 +186,9 @@ export class DashboardController {
         take: 10,
       });
 
-      // ✅ FIXED: Use type assertion to handle null
+      // ✅ FIXED: Handle null sourceIp with fallback
       const data = topSources.map((item) => ({
-        source: (item.sourceIp as string) || 'Unknown',
+        source: item.sourceIp || 'Unknown',
         count: item._count.sourceIp,
       }));
 
