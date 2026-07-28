@@ -166,7 +166,7 @@ export class DashboardController {
     }
   }
 
-  async getTopSources(req: Request, res: Response) {
+    async getTopSources(req: Request, res: Response) {
     try {
       const topSources = await prisma.securityEvent.groupBy({
         by: ['sourceIp'],
@@ -186,9 +186,8 @@ export class DashboardController {
         take: 10,
       });
 
-      // ✅ FIXED: Handle null sourceIp with fallback
       const data = topSources.map((item) => ({
-        source: item.sourceIp || 'Unknown',
+        source: item.sourceIp ?? 'Unknown',
         count: item._count.sourceIp,
       }));
 
@@ -198,6 +197,7 @@ export class DashboardController {
       });
     } catch (error) {
       console.error('Error fetching top sources:', error);
+
       res.status(500).json({
         success: false,
         error: 'Failed to fetch top sources',
