@@ -6,14 +6,12 @@ const prisma = new PrismaClient();
 export class DashboardController {
   async getMetrics(req: Request, res: Response) {
     try {
-      // Get current date for today's events
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
 
-      // Get all counts in parallel
       const [
         totalEvents,
         eventsToday,
@@ -124,7 +122,6 @@ export class DashboardController {
 
   async getEventsTimeline(req: Request, res: Response) {
     try {
-      // Get events for the last 24 hours grouped by hour
       const now = new Date();
       const twentyFourHoursAgo = new Date(now);
       twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
@@ -144,7 +141,6 @@ export class DashboardController {
         },
       });
 
-      // Group by hour
       const hourMap = new Map<string, number>();
       events.forEach((event) => {
         const hour = event.timestamp.getHours();
@@ -190,9 +186,9 @@ export class DashboardController {
         take: 10,
       });
 
-      // ✅ FIXED: Handle null sourceIp with fallback
+      // ✅ FIXED: Use type assertion to handle null
       const data = topSources.map((item) => ({
-        source: item.sourceIp || 'Unknown',
+        source: (item.sourceIp as string) || 'Unknown',
         count: item._count.sourceIp,
       }));
 
