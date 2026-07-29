@@ -141,17 +141,27 @@ export class DashboardController {
         },
       });
 
+      // Initialize all 24 hours with 0 events
       const hourMap = new Map<string, number>();
+      for (let i = 0; i < 24; i++) {
+        const hour = i.toString().padStart(2, '0');
+        hourMap.set(`${hour}:00`, 0);
+      }
+
+      // Fill in actual event counts
       events.forEach((event) => {
         const hour = event.timestamp.getHours();
         const key = `${hour.toString().padStart(2, '0')}:00`;
         hourMap.set(key, (hourMap.get(key) || 0) + 1);
       });
 
-      const data = Array.from(hourMap.entries()).map(([time, events]) => ({
-        time,
-        events,
-      }));
+      // Convert to array and sort by time
+      const data = Array.from(hourMap.entries())
+        .map(([time, events]) => ({
+          time,
+          events,
+        }))
+        .sort((a, b) => a.time.localeCompare(b.time));
 
       res.json({
         success: true,
@@ -186,8 +196,9 @@ export class DashboardController {
         take: 10,
       });
 
+      // Fixed: Handle potential null values with nullish coalescing
       const data = topSources.map((item) => ({
-        source: item.sourceIp || 'Unknown',
+        source: item.sourceIp ?? 'Unknown',
         count: item._count.sourceIp,
       }));
 
