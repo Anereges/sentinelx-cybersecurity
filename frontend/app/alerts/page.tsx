@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { Layout } from '@/components/layout/Layout';
-import { alertsApi, incidentsApi } from '@/lib/api';
+import { alertsApi, incidentsApi, api } from '@/lib/api';
 import { usePermissions } from '@/hooks/usePermissions';
-import { AlertTriangle, CheckCircle, Clock, XCircle, Filter, User, Shield, ChevronDown } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, XCircle, Filter, User, Shield, X } from 'lucide-react';
 
 interface Alert {
   id: string;
@@ -79,17 +79,26 @@ export default function AlertsPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/users', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setAvailableUsers(data.data);
-      }
+      const response = await api.get('/users');
+      console.log('Users fetched:', response.data);
+      setAvailableUsers(response.data.data || []);
     } catch (error) {
       console.error('Failed to fetch users:', error);
+      // Fallback: try using fetch directly
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/users', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableUsers(data.data || []);
+        }
+      } catch (fallbackError) {
+        console.error('Fallback fetch also failed:', fallbackError);
+      }
     }
   };
 
@@ -345,7 +354,20 @@ export default function AlertsPage() {
         {showAssignModal && selectedAlert && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="bg-gray-900 rounded-lg max-w-md w-full p-6 border border-gray-800">
-              <h2 className="text-xl font-bold text-white mb-4">Assign Alert</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-white">Assign Alert</h2>
+                <button
+                  onClick={() => {
+                    setShowAssignModal(false);
+                    setSelectedAlert(null);
+                    setSelectedUser('');
+                  }}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
               <p className="text-gray-400 text-sm mb-4">
                 Assign "{selectedAlert.title}" to a team member
               </p>
@@ -361,12 +383,19 @@ export default function AlertsPage() {
                     className="w-full bg-gray-800 text-white rounded-lg px-4 py-2 border border-gray-700 focus:border-blue-500 focus:outline-none"
                   >
                     <option value="">Select a user...</option>
-                    {availableUsers.map((user) => (
-                      <option key={user.id} value={user.id}>
-                        {user.name} ({user.email})
-                      </option>
-                    ))}
+                    {availableUsers.length === 0 ? (
+                      <option disabled>No users available</option>
+                    ) : (
+                      availableUsers.map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.name} ({user.email})
+                        </option>
+                      ))
+                    )}
                   </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {availableUsers.length} users available
+                  </p>
                 </div>
               </div>
               
@@ -397,7 +426,20 @@ export default function AlertsPage() {
         {showInvestigateModal && selectedAlert && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
             <div className="bg-gray-900 rounded-lg max-w-md w-full p-6 border border-gray-800">
-              <h2 className="text-xl font-bold text-white mb-4">Investigate Alert</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-white">Investigate Alert</h2>
+                <button
+                  onClick={() => {
+                    setShowInvestigateModal(false);
+                    setSelectedAlert(null);
+                    setInvestigationNote('');
+                  }}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
               <p className="text-gray-400 text-sm mb-4">
                 Starting investigation for: {selectedAlert.title}
               </p>
