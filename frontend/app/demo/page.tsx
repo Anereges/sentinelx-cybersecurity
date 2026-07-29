@@ -10,10 +10,23 @@ export default function DemoPage() {
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
 
+  // ✅ FIXED: Each role has its OWN credentials
   const demoCredentials = {
-    admin: { email: 'admin@sentinelx.local', password: 'Admin123!', label: 'Administrator' },
-    analyst: { email: 'analyst@sentinelx.local', password: 'Analyst123!', label: 'Security Analyst' },
-    viewer: { email: 'viewer@sentinelx.local', password: 'Viewer123!', label: 'Viewer' },
+    admin: { 
+      email: '19x@sentinelx.local', 
+      password: 'Hacker@19', 
+      label: 'Administrator' 
+    },
+    analyst: { 
+      email: 'sarah.johnson@sentinelx.local', 
+      password: 'Analyst123!', 
+      label: 'Security Analyst' 
+    },
+    viewer: { 
+      email: 'james.miller@sentinelx.local', 
+      password: 'Viewer123!', 
+      label: 'Viewer' 
+    },
   };
 
   const handleDemoLogin = async (role: 'admin' | 'analyst' | 'viewer') => {
@@ -176,11 +189,17 @@ export default function DemoPage() {
             Built with Next.js, TypeScript, Express, PostgreSQL, and Prisma
           </p>
           <div className="mt-4 flex justify-center gap-6 text-xs text-gray-600">
-            <span>🔐 Admin: admin@sentinelx.local</span>
-            <span>🔐 Analyst: analyst@sentinelx.local</span>
-            <span>🔐 Viewer: viewer@sentinelx.local</span>
+            <span>🔐 Admin: 19x@sentinelx.local</span>
+            <span>🔐 Analyst: sarah.johnson@sentinelx.local</span>
+            <span>🔐 Viewer: james.miller@sentinelx.local</span>
           </div>
-          <p className="text-xs text-gray-600 mt-1">Password for all: <span className="font-mono bg-gray-800 px-2 py-0.5 rounded">Admin123!</span></p>
+          <p className="text-xs text-gray-600 mt-1">
+            Password for Admin: <span className="font-mono bg-gray-800 px-2 py-0.5 rounded">Hacker@19</span>
+            {' | '}
+            Password for Analyst: <span className="font-mono bg-gray-800 px-2 py-0.5 rounded">Analyst123!</span>
+            {' | '}
+            Password for Viewer: <span className="font-mono bg-gray-800 px-2 py-0.5 rounded">Viewer123!</span>
+          </p>
         </div>
       </div>
     </div>
